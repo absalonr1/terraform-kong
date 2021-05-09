@@ -2,7 +2,7 @@ resource "aws_lb" "external_lbaas_kong" {
 
   name     = "externalLbaasKong"
   internal = false
-  subnets  = [aws_subnet.subnet_lbaas_1.id, aws_subnet.subnet_lbaas_2.id] #data.aws_subnet_ids.public.ids
+  subnets  = [for s in aws_subnet.subnet_lbaas : s.id]
 
   security_groups = [aws_security_group.sg_lbaas_kong.id]
 
@@ -82,16 +82,9 @@ resource "aws_lb_target_group" "kong_tg" {
 
 
 
-resource "aws_lb_target_group_attachment" "tgr_attachment_0" {
-
+resource "aws_lb_target_group_attachment" "tgr_attach_kong" {
+  count = var.kong_vm_instance_count
   target_group_arn = aws_lb_target_group.kong_tg.arn
-  target_id        = aws_instance.kong_vm_1.id
-  port             = aws_lb_target_group.kong_tg.port
-}
-
-resource "aws_lb_target_group_attachment" "tgr_attachment_1" {
-
-  target_group_arn = aws_lb_target_group.kong_tg.arn
-  target_id        = aws_instance.kong_vm_2.id
+  target_id        = aws_instance.kong_vm[count.index].id
   port             = aws_lb_target_group.kong_tg.port
 }

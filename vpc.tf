@@ -12,7 +12,7 @@ resource "aws_vpc" "kong_vpc" {
   #default_route_table_id 
 
   tags = {
-    Name = "kong_vpc"
+    Name = "kong_vpc_demo"
   }
 }
 
@@ -27,92 +27,60 @@ resource "aws_internet_gateway" "igw_lbaas_kong" {
   }
 }
 
+
 ##########################
 ##   Subnets Kong
 ##########################
-resource "aws_subnet" "subnet_kong_1" {
+resource "aws_subnet" "subnet_kong" {
+  for_each = var.subnets
   vpc_id            = aws_vpc.kong_vpc.id
-  cidr_block        = "10.10.0.0/27"
-  availability_zone = "us-west-2a"
+  cidr_block        = each.value.cidr
+  availability_zone =  each.value.az
   tags = {
-    Name = "subnet_kong_1"
+    Name = "subnet_kong_${each.key}"
   }
 
 }
-resource "aws_subnet" "subnet_kong_2" {
-  vpc_id            = aws_vpc.kong_vpc.id
-  cidr_block        = "10.10.0.32/27"
-  availability_zone = "us-west-2b"
-  tags = {
-    Name = "subnet_kong_2"
-  }
 
-}
-####################################
-##   Route table subnet Kong vm
-####################################
-resource "aws_route_table" "rt_kong1" {
-  vpc_id = aws_vpc.kong_vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gw_kong1.id
-  }
-  
-  tags = {
-    Name = "rt_kong1"
-  }
-}
-
-resource "aws_route_table" "rt_kong2" {
-  vpc_id = aws_vpc.kong_vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gw_kong2.id
-  }
-  
-  tags = {
-    Name = "rt_kong2"
-  }
-
-}
 
 #################################################
 ##  NAT GW y su EIP para las subnets de VMs Kong
 #################################################
 
-resource "aws_eip" "eip_natgw_kong1" {
+resource "aws_eip" "eip_natgw_kong" {
+  count = length(aws_subnet.subnet_kong) 
   vpc      = true
   depends_on = [aws_internet_gateway.igw_lbaas_kong]
   tags = {
-    Name = "eip_natgw_kong1"
+    Name = "eip_natgw_kong${count.index}"
   }
 }
 
-resource "aws_eip" "eip_natgw_kong2" {
-  vpc      = true
-  depends_on = [aws_internet_gateway.igw_lbaas_kong]
+
+resource "aws_nat_gateway" "nat_gw_kong" {
+  count = length(aws_eip.eip_natgw_kong)
+  allocation_id = aws_eip.eip_natgw_kong[count.index].id
+  subnet_id     = aws_subnet.subnet_kong[count.index].id
+  depends_on = [aws_eip.eip_natgw_kong]
+
   tags = {
-    Name = "eip_natgw_kong2"
+    Name = "nat_gw_kong${count.index}"
   }
 }
 
-resource "aws_nat_gateway" "nat_gw_kong1" {
-  allocation_id = aws_eip.eip_natgw_kong1.id
-  subnet_id     = aws_subnet.subnet_lbaas_1.id
-  depends_on = [aws_eip.eip_natgw_kong1]
-
-  tags = {
-    Name = "nat_gw_kong1"
+####################################
+##   Route table subnet Kong vm
+####################################
+resource "aws_route_table" "rt_kong" {
+  count = length(aws_nat_gateway.nat_gw_kong)
+  vpc_id = aws_vpc.kong_vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gw_kong[count.index].id
   }
-}
-
-resource "aws_nat_gateway" "nat_gw_kong2" {
-  allocation_id = aws_eip.eip_natgw_kong2.id
-  subnet_id     = aws_subnet.subnet_lbaas_2.id
-  depends_on = [aws_eip.eip_natgw_kong2]
-
+  
   tags = {
-    Name = "nat_gw_kong2"
+    Name = "rt_kong${count.index}"
   }
 }
 
@@ -120,35 +88,23 @@ resource "aws_nat_gateway" "nat_gw_kong2" {
 ##  Association Route table <-> subnet Kong
 #############################################
 
-resource "aws_route_table_association" "rt_assoc_subnets_kong1" {
-  subnet_id      = aws_subnet.subnet_kong_1.id
-  route_table_id = aws_route_table.rt_kong1.id
-}
-
-resource "aws_route_table_association" "rt_assoc_subnets_kong2" {
-  subnet_id      = aws_subnet.subnet_kong_2.id
-  route_table_id = aws_route_table.rt_kong2.id
+resource "aws_route_table_association" "rt_assoc_subnets_kong" {
+  count = length(aws_subnet.subnet_kong)
+  subnet_id      = aws_subnet.subnet_kong[count.index].id
+  route_table_id = aws_route_table.rt_kong[count.index].id
 }
 
 
-##########################
-##   Subnets ALB
-##########################
-resource "aws_subnet" "subnet_lbaas_1" {
+##############################################################################
+##                       Subnets ALB
+##############################################################################
+resource "aws_subnet" "subnet_lbaas" {
+  for_each = var.subnets_lbaas
   vpc_id            = aws_vpc.kong_vpc.id
-  cidr_block        = "10.10.0.64/27"
-  availability_zone = "us-west-2a"
+  cidr_block        = each.value.cidr
+  availability_zone =  each.value.az
   tags = {
-    Name = "subnet_lbaas_1"
-  }
-
-}
-resource "aws_subnet" "subnet_lbaas_2" {
-  vpc_id            = aws_vpc.kong_vpc.id
-  cidr_block        = "10.10.0.96/27"
-  availability_zone = "us-west-2b"
-  tags = {
-    Name = "subnet_lbaas_2"
+    Name = "subnet_lbaas_${each.key}"
   }
 
 }
@@ -172,13 +128,8 @@ resource "aws_route_table" "rt_lbaas_kong" {
 #############################################
 ##  Association Route table <-> subnet lbbas
 #############################################
-resource "aws_route_table_association" "rt_assoc_subnets_lbass1" {
-  subnet_id      = aws_subnet.subnet_lbaas_1.id
+resource "aws_route_table_association" "rt_assoc_subnets_lbass" {
+  count = length(aws_subnet.subnet_lbaas)
+  subnet_id      = aws_subnet.subnet_lbaas[count.index].id
   route_table_id = aws_route_table.rt_lbaas_kong.id
 }
-
-resource "aws_route_table_association" "rt_assoc_subnets_lbass2" {
-  subnet_id      = aws_subnet.subnet_lbaas_2.id
-  route_table_id = aws_route_table.rt_lbaas_kong.id
-}
-

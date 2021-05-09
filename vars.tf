@@ -1,5 +1,6 @@
 variable "region" {
-  default = "us-west-2"
+  #default = "us-west-2"
+  default = "us-east-1"
 }
 
 variable "health_check_interval" {
@@ -155,3 +156,43 @@ variable "db_engine_version" {
 }
 
 
+
+/* variable "subnets"{
+   type = map(string)
+   default = {
+    0 ="10.10.0.0/27"
+    1 = "10.10.0.32/27"
+  }
+}
+ */
+variable "subnets"{
+   type = map(map(string))
+   default = {
+    0 = {
+      cidr ="10.10.0.0/27"
+      az = "us-east-1a"
+    }
+    1 = {
+      cidr ="10.10.0.32/27"
+      az = "us-east-1b"
+    }
+  }
+}
+
+variable "subnets_lbaas"{
+   type = map(map(string))
+   default = {
+    0 = {
+      cidr ="10.10.0.64/27"
+      az = "us-east-1a"
+    }
+    1 = {
+      cidr ="10.10.0.96/27"
+      az = "us-east-1b"
+    }
+  }
+}
+
+variable "kong_vm_instance_count"{
+  default = 4
+}
