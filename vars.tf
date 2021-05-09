@@ -1,6 +1,6 @@
 variable "region" {
-  #default = "us-west-2"
-  default = "us-east-1"
+  default = "us-west-2"
+  #default = "us-east-1"
 }
 
 variable "health_check_interval" {
@@ -63,32 +63,21 @@ variable "ssl_policy" {
 }
 
 
-// us-east-1
-variable "ami2" {
-  type = map(string)
-
-  default = {
-    prod = "ami-0742b4e673072066f"
-    dev = "ami-0742b4e673072066f"
-    poc = "ami-0742b4e673072066f"
-  }
-}
-
 // Oregon
 variable "ami" {
   type = map(map(string))
 
   default = {
     us-west-2 ={
-      prod = "ami-0742b4e673072066f"
-      dev = "ami-0742b4e673072066f"
+      prod = "ami-0cf6f5c8a62fa5da6"
+      dev = "ami-0cf6f5c8a62fa5da6"
       poc = "ami-0cf6f5c8a62fa5da6"
   
     }
     us-east-1 ={
-      prod = "ami-0742b4e673072066f"
-      dev = "ami-0742b4e673072066f"
-      poc = "ami-0742b4e673072066f"
+      prod = "ami-0d5eff06f840b45e9"
+      dev = "ami-0d5eff06f840b45e9"
+      poc = "ami-0d5eff06f840b45e9"
   
     }
   }
@@ -160,11 +149,11 @@ variable "subnets"{
    default = {
     0 = {
       cidr ="10.10.0.0/27"
-      az = "us-east-1a"
+      #az = "us-east-1a"
     }
     1 = {
       cidr ="10.10.0.32/27"
-      az = "us-east-1b"
+      #az = "us-east-1b"
     }
   }
 }
@@ -174,14 +163,27 @@ variable "subnets_lbaas"{
    default = {
     0 = {
       cidr ="10.10.0.64/27"
-      az = "us-east-1a"
+      #az = "us-east-1a"
     }
     1 = {
       cidr ="10.10.0.96/27"
-      az = "us-east-1b"
+      #az = "us-east-1b"
     }
   }
 }
+
+variable "availability_zones"{
+   #type = map(map(list))
+   default = {
+    us-east-1 = {
+      zones = ["us-east-1a","us-east-1b"]
+    }
+    us-west-2 = {
+      zones = ["us-west-2a","us-west-2b"]
+    }
+  }
+}
+
 
 variable "kong_vm_instance_count"{
   default = 4

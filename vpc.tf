@@ -35,7 +35,7 @@ resource "aws_subnet" "subnet_kong" {
   for_each = var.subnets
   vpc_id            = aws_vpc.kong_vpc.id
   cidr_block        = each.value.cidr
-  availability_zone =  each.value.az
+  availability_zone = var.availability_zones[var.region].zones[index(keys(var.subnets), each.key)]  #each.value.az
   tags = {
     Name = "subnet_kong_${each.key}"
   }
@@ -102,7 +102,7 @@ resource "aws_subnet" "subnet_lbaas" {
   for_each = var.subnets_lbaas
   vpc_id            = aws_vpc.kong_vpc.id
   cidr_block        = each.value.cidr
-  availability_zone =  each.value.az
+  availability_zone =  var.availability_zones[var.region].zones[index(keys(var.subnets_lbaas), each.key)] #each.value.az
   tags = {
     Name = "subnet_lbaas_${each.key}"
   }
