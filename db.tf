@@ -20,15 +20,8 @@ resource "aws_db_instance" "kong_bd" {
 #Leeme: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets
 resource "aws_db_subnet_group" "kong_bd_subnet_group" {
   name       = "kong_bd_subnet_group"
-  #subnet_ids = [aws_subnet.subnet_kong[1].id]
   subnet_ids = [for s in aws_subnet.subnet_kong : s.id]
 }
-
-#output "subnet_group_id" {
-#  value       = join("", aws_db_subnet_group.default.*.id)
-#  description = "ID of the created Subnet Group"
-#}
-
 
 resource "aws_security_group" "sg_kong_bd" {
   name   = "sg_kong_bd"

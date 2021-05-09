@@ -77,14 +77,13 @@ resource "aws_instance" "kong_vm" {
 
   subnet_id       = aws_subnet.subnet_kong[count.index % length(aws_subnet.subnet_kong)].id
 
-  user_data = templatefile("user_data-no_bd.tpl",{})
-  /* user_data = templatefile("user_data.tpl",{
+  user_data = templatefile("user_data.tpl",{
         db_ip = aws_db_instance.kong_bd.address, 
         db_pg_database=var.kong_db, 
         db_pg_user=var.kong_db_username, db_pg_password=var.kong_db_password }
         ) 
- */
- #depends_on = [aws_db_instance.kong_bd]
+ 
+ depends_on = [aws_db_instance.kong_bd]
 
   tags = {
     Name = "kong_vm_${count.index}"
@@ -100,7 +99,7 @@ resource "aws_instance" "kong_bastion" {
   security_groups = [aws_security_group.sg_kong_bastion.id]
   subnet_id       = aws_subnet.subnet_lbaas[0].id
 
-/*   user_data = templatefile("user_data_bastion.tpl",{
+   user_data = templatefile("user_data_bastion.tpl",{
         db_ip = aws_db_instance.kong_bd.address, 
         pg_admin_user=var.db_username, 
         pg_admin_password=var.db_password, 
@@ -108,9 +107,9 @@ resource "aws_instance" "kong_bastion" {
         kong_bd_user_pass=var.kong_db_password,
         kong_bd_name=var.kong_db
       }
-    ) */
+    )
   
-  #depends_on = [aws_db_instance.kong_bd]
+  depends_on = [aws_db_instance.kong_bd]
 
   tags = {
     Name = "kong_bastion"

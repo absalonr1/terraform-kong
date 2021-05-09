@@ -155,16 +155,6 @@ variable "db_engine_version" {
   default = "11.5"
 }
 
-
-
-/* variable "subnets"{
-   type = map(string)
-   default = {
-    0 ="10.10.0.0/27"
-    1 = "10.10.0.32/27"
-  }
-}
- */
 variable "subnets"{
    type = map(map(string))
    default = {
