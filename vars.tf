@@ -117,7 +117,7 @@ variable "environment" {
 }
 
 variable "db_password" {
-  default = "password"
+  default = "3uF6nBrcv8Q5qeD8"
 }
 
 variable "db_username" {
@@ -126,7 +126,7 @@ variable "db_username" {
 
 #----------- "equema" de KONG en postgress -----------
 variable "kong_db_password" {
-  default = "kong"
+  default = "g2YDHdAmLpnQW9bg"
 }
 
 variable "kong_db_username" {
@@ -186,5 +186,5 @@ variable "availability_zones"{
 
 
 variable "kong_vm_instance_count"{
-  default = 4
+  default = 2
 }

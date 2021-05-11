@@ -1,6 +1,6 @@
 
 resource "aws_db_instance" "kong_bd" {
-  publicly_accessible = true
+  publicly_accessible = false
   name                = "kongdb"
   allocated_storage    = 100
   db_subnet_group_name = "kong_bd_subnet_group"

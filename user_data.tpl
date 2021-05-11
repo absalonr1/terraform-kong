@@ -29,7 +29,7 @@ echo "plugins = bundled,jwt-keycloak" >> /etc/kong/kong.conf
 echo "admin_listen = 0.0.0.0:8001" >> /etc/kong/kong.conf
 
 #DB Postgres
-export KONG_PASSWORD=kong
+export KONG_PASSWORD=${db_pg_password}
 export KONG_LOG_LEVEL=error
 echo "database = postgres" >> /etc/kong/kong.conf
 echo "pg_host = ${db_ip}" >> /etc/kong/kong.conf
@@ -45,4 +45,4 @@ echo "pg_database =${db_pg_database}" >> /etc/kong/kong.conf
 #---- tarea manual mientras se ve como automatizar
 #-------------------------------------------------------------------
 sudo /usr/local/bin/kong migrations bootstrap [-c /etc/kong/kong.conf]
-#/usr/local/bin/kong start [-c /etc/kong/kong.conf]
+sudo /usr/local/bin/kong start [-c /etc/kong/kong.conf]
