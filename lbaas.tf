@@ -60,20 +60,20 @@ resource "aws_lb_listener" "external-http" {
   }
 }
 
-resource "aws_lb_listener" "external-https" {
+/* resource "aws_lb_listener" "external-https" {
 
   load_balancer_arn = aws_lb.external_lbaas_kong.arn
   port              = "443"
   protocol          = "HTTPS"
 
-  #ssl_policy      = var.ssl_policy
-  #certificate_arn = data.aws_acm_certificate.external-cert.arn
+  ssl_policy      = var.ssl_policy
+  certificate_arn = data.aws_acm_certificate.external-cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.kong_tg.arn
     type             = "forward"
   }
-}
+} */
 
 
 # ---- target group

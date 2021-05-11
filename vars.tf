@@ -55,12 +55,6 @@ variable "key_pair" {
   # Terraform default is 60
   default = "kong-key-pair"
 }
-variable "ssl_policy" {
-  description = "SSL Policy for HTTPS Listeners"
-  type        = string
-
-  default = "ELBSecurityPolicy-TLS-1-2-2017-01"
-}
 
 
 // Oregon
@@ -187,4 +181,17 @@ variable "availability_zones"{
 
 variable "kong_vm_instance_count"{
   default = 2
+}
+
+variable "ssl_policy" {
+  description = "SSL Policy for HTTPS Listeners"
+  type        = string
+
+  default = "ELBSecurityPolicy-TLS-1-2-2017-01"
+}
+
+variable "ssl_cert_external" {
+  description = "SSL certificate domain name for the external Kong Proxy HTTPS listener"
+  type        = string
+  default = "qaapigw.bluex.cl"
 }

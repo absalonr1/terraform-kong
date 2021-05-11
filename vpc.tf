@@ -56,11 +56,11 @@ resource "aws_eip" "eip_natgw_kong" {
   }
 }
 
-
+# https://aws.amazon.com/premiumsupport/knowledge-center/ec2-internet-connectivity/
 resource "aws_nat_gateway" "nat_gw_kong" {
   count = length(aws_eip.eip_natgw_kong)
   allocation_id = aws_eip.eip_natgw_kong[count.index].id
-  subnet_id     = aws_subnet.subnet_kong[count.index].id
+  subnet_id     = aws_subnet.subnet_lbaas[count.index].id
   depends_on = [aws_eip.eip_natgw_kong]
 
   tags = {

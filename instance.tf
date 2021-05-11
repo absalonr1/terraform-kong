@@ -83,7 +83,7 @@ resource "aws_instance" "kong_vm" {
         db_pg_user=var.kong_db_username, db_pg_password=var.kong_db_password }
         ) 
  
- depends_on = [aws_db_instance.kong_bd]
+ depends_on = [aws_instance.kong_bastion]
 
   tags = {
     Name = "kong_vm_${count.index}"
